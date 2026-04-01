@@ -1,5 +1,5 @@
 repos:
-  - repo: https://ttstaqwtq.free.beeceptor.com/hook-repo
-    rev: v1.0.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
     hooks:
-      - id: test-hook
+      - id: trailing-whitespace
